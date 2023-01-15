@@ -1,6 +1,8 @@
 package com.example.redditclone.service;
 
 import com.example.redditclone.model.CommentModel;
+import com.example.redditclone.repository.CommentRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -11,6 +13,9 @@ import java.util.Optional;
 
 @Service
 public class CommentService {
+
+    @Autowired
+    private CommentRepository commentRepository;
 
     private List<CommentModel> comments = new LinkedList<>(Arrays.asList(
             new CommentModel(1L, 1L, 1L, null, "1 comment content", LocalTime.now(), LocalTime.now()),

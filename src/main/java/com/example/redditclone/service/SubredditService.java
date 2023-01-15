@@ -1,6 +1,8 @@
 package com.example.redditclone.service;
 
 import com.example.redditclone.model.SubredditModel;
+import com.example.redditclone.repository.SubredditRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -10,6 +12,9 @@ import java.util.Optional;
 
 @Service
 public class SubredditService {
+
+    @Autowired
+    private SubredditRepository subredditRepository;
 
     private List<SubredditModel> subreddits =
         new LinkedList<>(Arrays.asList(

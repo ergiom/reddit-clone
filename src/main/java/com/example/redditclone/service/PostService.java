@@ -1,6 +1,8 @@
 package com.example.redditclone.service;
 
 import com.example.redditclone.model.PostModel;
+import com.example.redditclone.repository.PostRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
@@ -11,6 +13,9 @@ import java.util.Optional;
 
 @Service
 public class PostService {
+
+    @Autowired
+    private PostRepository postRepository;
 
     private List<PostModel> posts = new LinkedList<>(Arrays.asList(
             new PostModel(1L, 1L, 1L, "post nr 1", "post nr 1 content", LocalTime.now(), LocalTime.now()),
