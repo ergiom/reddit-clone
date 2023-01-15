@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
+@RequestMapping("/subreddits/{subreddit_id}/posts")
 public class PostController {
 
     @Autowired
@@ -17,34 +18,34 @@ public class PostController {
     @Autowired
     private SubredditService subredditService;
 
-    @GetMapping("/subreddits/{subreddit_id}/posts")
+    @GetMapping
     public List<PostModel> getAllSubredditPosts(@PathVariable(name = "subreddit_id") long subredditId) {
         return postService.fetchAllSubredditPosts(subredditId);
     }
 
-    @GetMapping("/subreddits/{subreddit_id}/posts/{id}")
+    @GetMapping("{id}")
     public PostModel getPost(@PathVariable(name = "id") long id) {
         return postService.findPostById(id);
     }
 
-    @PostMapping("/subreddits/{subreddit_id}/posts")
+    @PostMapping
     public void savePost(@RequestBody PostModel post,
                          @PathVariable(name = "subreddit_id") long subredditId) {
         post.setSubredditId(subredditId);
         postService.savePost(post);
     }
 
-    @DeleteMapping("/subreddits/{subreddit_id}/posts/{id}")
+    @DeleteMapping("{id}")
     public void deletePost(@PathVariable(name = "id") long id) {
         postService.deletePostById(id);
     }
 
-    @PutMapping("/subreddits/{subreddit_id}/posts/{id}")
+    @PutMapping("{id}")
     public void updatePost(@PathVariable(name = "id") long id,
                            @PathVariable(name = "subreddit_id") long subredditId,
                            @RequestBody PostModel newPost) {
         newPost.setId(id);
-        newPost.setSubredditId(subredditId);
+//        newPost.setSubredditId(subredditId);
         postService.updatePost(newPost);
     }
 }
