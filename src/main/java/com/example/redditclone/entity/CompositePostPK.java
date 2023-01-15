@@ -5,11 +5,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.Embeddable;
-import javax.persistence.ManyToOne;
+import javax.persistence.*;
 import java.io.Serializable;
 
 @Embeddable
+@AttributeOverrides({
+        @AttributeOverride(
+                name = "subreddit",
+                column = @Column(name = "subreddit_id")
+        )
+})
 @Data
 @Builder
 @NoArgsConstructor
