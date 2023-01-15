@@ -26,11 +26,11 @@ public class CommentService {
     private PostService postService;
 
     public List<Comment> getAllCommentsForPost(long subredditId, long postId) {
-        return commentRepository.findAllBySubredditIdAndPostId(subredditId, postId);
+        return commentRepository.findAllByPostSubredditIdAndPostId(subredditId, postId);
     }
 
     public Comment findCommentById(long subredditId, long postId, long id) {
-        Optional<Comment> optComment = commentRepository.findBySubredditIdAndPostIdAndId(subredditId, postId, id);
+        Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
         if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
 
         return optComment.get();
@@ -38,10 +38,14 @@ public class CommentService {
 
     public void saveComment(CommentModel values) {
         LocalTime now = LocalTime.now();
+        Optional<Comment> optParentComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
+                values.getSubredditId(),
+                values.getPostId(),
+                values.getParentCommentId());
+
         Comment comment = Comment.builder()
                 .author(userRepository.findById(1L).get())
-                .parentComment(null)
-                .subreddit(subredditService.fetchSubreddit(values.getSubredditId()))
+                .parentComment(optParentComment.orElse(null))
                 .post(postService.findPostById(values.getSubredditId(), values.getPostId()))
                 .content(values.getContent())
                 .published(now)
@@ -52,11 +56,11 @@ public class CommentService {
     }
 
     public void deleteComment(long subredditId, long postId, long id) {
-        commentRepository.deleteBySubredditIdAndPostIdAndId(subredditId, postId, id);
+        commentRepository.deleteByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
     }
 
     public void updateComment(CommentModel values) {
-        Optional<Comment> optComment = commentRepository.findBySubredditIdAndPostIdAndId(
+        Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
                 values.getSubredditId(),
                 values.getPostId(),
                 values.getId()

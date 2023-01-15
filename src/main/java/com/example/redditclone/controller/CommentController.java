@@ -35,6 +35,7 @@ public class CommentController {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         commentService.saveComment(comment);
+        comment.setParentCommentId(null);
     }
 
     @PostMapping("{parent_id}")

@@ -13,7 +13,6 @@ import java.io.Serializable;
 @AllArgsConstructor
 public class CompositeCommentPK implements Serializable {
 
-    private Long subreddit;
-    private Long post;
+    private CompositePostPK post;
     private Long id;
 }

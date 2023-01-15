@@ -9,9 +9,9 @@ import java.util.Optional;
 
 @Repository
 public interface CommentRepository extends JpaRepository<Comment, Long> {
-    List<Comment> findAllBySubredditIdAndPostId(long subredditId, long postId);
+    List<Comment> findAllByPostSubredditIdAndPostId(long subredditId, long postId);
 
-    Optional<Comment> findBySubredditIdAndPostIdAndId(long subredditId, long postId, long id);
+    Optional<Comment> findByPostSubredditIdAndPostIdAndId(long subredditId, long postId, long id);
 
-    void deleteBySubredditIdAndPostIdAndId(long subredditId, long postId, long id);
+    void deleteByPostSubredditIdAndPostIdAndId(long subredditId, long postId, long id);
 }
