@@ -1,12 +1,13 @@
 package com.example.redditclone.service;
 
+import com.example.redditclone.entity.Subreddit;
+import com.example.redditclone.entity.User;
 import com.example.redditclone.model.SubredditModel;
 import com.example.redditclone.repository.SubredditRepository;
+import com.example.redditclone.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -15,66 +16,52 @@ public class SubredditService {
 
     @Autowired
     private SubredditRepository subredditRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private List<SubredditModel> subreddits =
-        new LinkedList<>(Arrays.asList(
-                new SubredditModel(1L, 1L, "catz"),
-                new SubredditModel(2L, 1L, "dogz")
-        ));
 
-    public List<SubredditModel> fetchSubreddits() {
-        return new LinkedList<>(subreddits);
+    public List<Subreddit> fetchSubreddits() {
+        return subredditRepository.findAll();
     }
 
     public void saveSubreddit(SubredditModel subredditModel) {
-        subreddits.add(subredditModel);
+        User user = userRepository.findById(1L).get();
+        Subreddit subreddit = Subreddit.builder()
+                .owner(user)
+                .name(subredditModel.getName())
+                .build();
+
+        subredditRepository.save(subreddit);
     }
 
-    public SubredditModel fetchSubreddit(long id) {
-        Optional<SubredditModel> optSubreddit = findSubreddit(id);
+    public Subreddit fetchSubreddit(long id) {
+        Optional<Subreddit> optSubreddit = subredditRepository.findById(id);
         if (optSubreddit.isPresent()) return optSubreddit.get();
 
         throw new RuntimeException("This subreddit does not exist");
     }
 
     public void removeSubreddit(long id) {
-        Optional<SubredditModel> optSubreddit = findSubreddit(id);
-        if (optSubreddit.isPresent()) {
-            subreddits.remove(optSubreddit.get());
-            return;
-        }
-
-        throw new RuntimeException("This subreddit does not exist");
+        subredditRepository.deleteById(id);
     }
 
-    public void updateSubreddit(long id, SubredditModel newSubreddit) {
-        Optional<SubredditModel> optSubreddit = findSubreddit(id);
-        if (optSubreddit.isPresent()) {
-            updateSubreddit(optSubreddit.get(), newSubreddit);
-            return;
-        }
+    public void updateSubreddit(long id, SubredditModel values) {
+        Optional<Subreddit> optSubreddit = subredditRepository.findById(id);
+        if (!optSubreddit.isPresent()) throw new RuntimeException("This subreddit does not exist");
 
-        throw new RuntimeException("This subreddit does not exist");
+        Subreddit subreddit = optSubreddit.get();
+        updateSubreddit(subreddit, values);
+        subredditRepository.save(subreddit);
     }
 
-    private Optional<SubredditModel> findSubredditByName(String name) {
-        for (SubredditModel subreddit: subreddits) {
-            if (subreddit.getName().equalsIgnoreCase(name)) return Optional.of(subreddit);
+    private void updateSubreddit(Subreddit subreddit, SubredditModel values) {
+        if (values.getOwnerId() != null) {
+            Optional<User> optOwner = userRepository.findById(values.getOwnerId());
+            if (!optOwner.isPresent()) throw new RuntimeException("No user of this id");
+
+            User owner = optOwner.get();
+            subreddit.setOwner(owner);
         }
-
-        return Optional.empty();
-    }
-
-    private Optional<SubredditModel> findSubreddit(long id) {
-        for (SubredditModel subreddit: subreddits) {
-            if (subreddit.getId() == id) return Optional.of(subreddit);
-        }
-
-        return Optional.empty();
-    }
-
-    private void updateSubreddit(SubredditModel toUpdate, SubredditModel values) {
-        if (values.getOwnerId() != null) toUpdate.setOwnerId(values.getOwnerId());
-        if (values.getName() != null) toUpdate.setName(values.getName());
+        if (values.getName() != null) subreddit.setName(values.getName());
     }
 }
