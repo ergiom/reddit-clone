@@ -6,7 +6,9 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "subreddit_tbl")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,10 +20,16 @@ public class Subreddit {
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @ToString.Exclude
     private User owner;
 
     @Column(nullable = false, unique = true)
     private String name;
     //todo
 //    private List<Post> posts;
+
+    @ToString.Include
+    public Long strOwnerId() {
+        return owner.getId();
+    }
 }

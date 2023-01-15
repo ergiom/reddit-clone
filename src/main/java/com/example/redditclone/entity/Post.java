@@ -1,10 +1,7 @@
 package com.example.redditclone.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
@@ -12,7 +9,9 @@ import java.time.LocalTime;
 @Entity
 @IdClass(CompositePostPK.class)
 @Table(name = "post_tbl")
-@Data
+@Getter
+@Setter
+@ToString
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -28,10 +27,12 @@ public class Post {
     @Id
     @ManyToOne
     @JoinColumn(nullable = false)
+    @ToString.Exclude
     private Subreddit subreddit;
 
     @ManyToOne
     @JoinColumn(nullable = false)
+    @ToString.Exclude
     private User author;
 
     @Column(nullable = false)
@@ -42,4 +43,14 @@ public class Post {
     private LocalTime published;
     @Column(nullable = false)
     private LocalTime lastEdited;
+
+    @ToString.Include
+    public Long strSubredditId() {
+        return subreddit.getId();
+    }
+
+    @ToString.Include
+    public Long strAuthorId() {
+        return author.getId();
+    }
 }
