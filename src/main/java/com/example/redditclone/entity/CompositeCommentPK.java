@@ -31,5 +31,6 @@ public class CompositeCommentPK implements Serializable {
     @ManyToOne
     private Post post;
 
+    @GeneratedValue
     private Long id;
 }

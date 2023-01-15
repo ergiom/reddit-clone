@@ -24,5 +24,6 @@ public class CompositePostPK implements Serializable {
     @ManyToOne
     private Subreddit subreddit;
 
+    @GeneratedValue
     private Long id;
 }
