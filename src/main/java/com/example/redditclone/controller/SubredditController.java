@@ -19,7 +19,7 @@ public class SubredditController {
     }
 
     @GetMapping("/subreddits/{id}")
-    public SubredditModel getSubredditByName(@PathVariable(name = "id") long id) {
+    public SubredditModel getSubreddit(@PathVariable(name = "id") long id) {
         return subredditService.fetchSubreddit(id);
     }
 
