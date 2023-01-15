@@ -1,0 +1,1 @@
+INSERT INTO user_tbl(id, name) VALUES (1, 'Tom');
