@@ -31,14 +31,6 @@ public class PostService {
         throw new RuntimeException("Post not found");
     }
 
-    private Optional<PostModel> findPost(long id) {
-        for (PostModel post: posts) {
-            if (post.getId() == id) return Optional.of(post);
-        }
-
-        return Optional.empty();
-    }
-
     public void savePost(PostModel post) {
         LocalTime now = LocalTime.now();
 
@@ -66,5 +58,13 @@ public class PostService {
         if (values.getTitle() != null) oldPost.setTitle(values.getTitle());
 
         oldPost.setLastEdited(LocalTime.now());
+    }
+
+    private Optional<PostModel> findPost(long id) {
+        for (PostModel post: posts) {
+            if (post.getId() == id) return Optional.of(post);
+        }
+
+        return Optional.empty();
     }
 }
