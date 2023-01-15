@@ -28,6 +28,16 @@ public class CommentController {
     public void saveComment(@RequestBody CommentModel comment,
                             @PathVariable(name = "post_id") long postId) {
         comment.setPostId(postId);
+        comment.setParentCommentId(null);
+        commentService.saveComment(comment);
+    }
+
+    @PostMapping("{parent_id}")
+    public void saveChildComment(@RequestBody CommentModel comment,
+                                 @PathVariable(name = "parent_id") long parentId,
+                                 @PathVariable(name = "post_id") long postId) {
+        comment.setPostId(postId);
+        comment.setParentCommentId(parentId);
         commentService.saveComment(comment);
     }
 
