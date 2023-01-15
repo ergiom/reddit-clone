@@ -21,7 +21,7 @@ public class PostService {
     ));
 
     public List<PostModel> fetchAllSubredditPosts(long subredditId) {
-        return posts;
+        return findSubredditPosts(subredditId);
     }
 
     public PostModel findPostById(long id) {
@@ -66,5 +66,14 @@ public class PostService {
         }
 
         return Optional.empty();
+    }
+
+    private List<PostModel> findSubredditPosts(long subredditId) {
+        List<PostModel> selectedPosts = new LinkedList<>();
+        for (PostModel post: posts) {
+            if (post.getSubredditId() == subredditId) selectedPosts.add(post);
+        }
+
+        return selectedPosts;
     }
 }

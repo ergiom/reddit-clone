@@ -18,7 +18,7 @@ public class SubredditService {
         ));
 
     public List<SubredditModel> fetchSubreddits() {
-        return subreddits;
+        return new LinkedList<>(subreddits);
     }
 
     public void saveSubreddit(SubredditModel subredditModel) {
