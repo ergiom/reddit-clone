@@ -5,7 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
 
 @Data
 @Builder
@@ -13,10 +12,7 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class PostModel {
     private Long id;
-    private Long authorId;
     private Long subredditId;
     private String title;
     private String content;
-    private LocalTime published;
-    private LocalTime lastEdited;
 }

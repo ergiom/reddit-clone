@@ -1,84 +1,78 @@
 package com.example.redditclone.service;
 
+import com.example.redditclone.entity.Post;
+import com.example.redditclone.entity.Subreddit;
 import com.example.redditclone.model.PostModel;
 import com.example.redditclone.repository.PostRepository;
+import com.example.redditclone.repository.SubredditRepository;
+import com.example.redditclone.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class PostService {
 
     @Autowired
     private PostRepository postRepository;
 
-    private List<PostModel> posts = new LinkedList<>(Arrays.asList(
-            new PostModel(1L, 1L, 1L, "post nr 1", "post nr 1 content", LocalTime.now(), LocalTime.now()),
-            new PostModel(2L, 1L, 1L, "post nr 2", "post nr 2 content", LocalTime.now(), LocalTime.now()),
-            new PostModel(3L, 1L, 1L, "post nr 3", "post nr 3 content", LocalTime.now(), LocalTime.now()),
-            new PostModel(4L, 1L, 1L, "post nr 4", "post nr 4 content", LocalTime.now(), LocalTime.now()),
-            new PostModel(5L, 1L, 1L, "post nr 5", "post nr 5 content", LocalTime.now(), LocalTime.now())
-    ));
+    @Autowired
+    private UserRepository userRepository;
 
-    public List<PostModel> fetchAllSubredditPosts(long subredditId) {
-        return findSubredditPosts(subredditId);
+    @Autowired
+    private SubredditRepository subredditRepository;
+
+    public List<Post> fetchAllSubredditPosts(long subredditId) {
+        return postRepository.findBySubredditId(subredditId);
     }
 
-    public PostModel findPostById(long id) {
-        Optional<PostModel> optPost = findPost(id);
+    public Post findPostById(long subredditId, long id) {
+        Optional<Post> optPost = postRepository.findByIdAndSubredditId(id, subredditId);
         if (optPost.isPresent()) return optPost.get();
 
         throw new RuntimeException("Post not found");
     }
 
-    public void savePost(PostModel post) {
+    public void savePost(PostModel postModel) {
+        Optional<Subreddit> optSubreddit = subredditRepository.findById(postModel.getSubredditId());
+        if (!optSubreddit.isPresent()) throw new RuntimeException("Subreddit does not exist");
+
+        Subreddit subreddit = optSubreddit.get();
         LocalTime now = LocalTime.now();
 
-        post.setPublished(now);
-        post.setLastEdited(now);
-        posts.add(post);
+        Post post = Post.builder()
+                .subreddit(subreddit)
+                .author(userRepository.findById(1L).get())
+                .title(postModel.getTitle())
+                .content(postModel.getContent())
+                .published(now)
+                .lastEdited(now)
+                .build();
+
+        log.info("Saving post: " + post);
+        postRepository.save(post);
     }
 
-    public void deletePostById(long id) {
-        Optional<PostModel> optPost = findPost(id);
-        if (optPost.isPresent()) {
-            posts.remove(optPost.get());
-            return;
-        }
-
-        throw new RuntimeException("Post not found");
+    public void deletePostById(long subredditId, long id) {
+        postRepository.deleteByIdAndSubredditId(id, subredditId);
     }
 
     public void updatePost(PostModel values) {
-        Optional<PostModel> optPost = findPost(values.getId());
+        Optional<Post> optPost = postRepository.findByIdAndSubredditId(values.getId(), values.getSubredditId());
         if (!optPost.isPresent()) throw new RuntimeException("Post not found");
 
-        PostModel oldPost = optPost.get();
-        if (values.getContent() != null) oldPost.setContent(values.getContent());
-        if (values.getTitle() != null) oldPost.setTitle(values.getTitle());
+        LocalTime now = LocalTime.now();
+        Post post = optPost.get();
 
-        oldPost.setLastEdited(LocalTime.now());
-    }
+        if (values.getContent() != null) post.setContent(values.getContent());
+        if (values.getTitle() != null) post.setTitle(values.getTitle());
+        post.setLastEdited(now);
 
-    private Optional<PostModel> findPost(long id) {
-        for (PostModel post: posts) {
-            if (post.getId() == id) return Optional.of(post);
-        }
-
-        return Optional.empty();
-    }
-
-    private List<PostModel> findSubredditPosts(long subredditId) {
-        List<PostModel> selectedPosts = new LinkedList<>();
-        for (PostModel post: posts) {
-            if (post.getSubredditId() == subredditId) selectedPosts.add(post);
-        }
-
-        return selectedPosts;
+        postRepository.save(post);
     }
 }
