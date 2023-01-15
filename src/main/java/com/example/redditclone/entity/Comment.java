@@ -33,6 +33,7 @@ public class Comment {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private User author;
 
     @ManyToOne
@@ -43,7 +44,10 @@ public class Comment {
     })
     private Comment parentComment;
 
+    @Column(nullable = false)
     private String content;
+    @Column(nullable = false, updatable = false)
     private LocalTime published;
+    @Column(nullable = false)
     private LocalTime lastEdited;
 }

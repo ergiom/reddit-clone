@@ -27,13 +27,19 @@ public class Post {
     @JsonIgnore
     @Id
     @ManyToOne
-    @JoinColumn
+    @JoinColumn(nullable = false)
     private Subreddit subreddit;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private User author;
+
+    @Column(nullable = false)
     private String title;
+    @Column(nullable = false)
     private String content;
+    @Column(nullable = false, updatable = false)
     private LocalTime published;
+    @Column(nullable = false)
     private LocalTime lastEdited;
 }

@@ -17,8 +17,10 @@ public class Subreddit {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(nullable = false)
     private User owner;
 
+    @Column(nullable = false, unique = true)
     private String name;
     //todo
 //    private List<Post> posts;
