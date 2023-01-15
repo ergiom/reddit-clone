@@ -1,5 +1,6 @@
 package com.example.redditclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -17,14 +18,13 @@ import java.time.LocalTime;
 @AllArgsConstructor
 
 public class Post {
-    public Post(Long id) {
-        this.id = id;
-    }
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "POST_ID_SEQ")
+    @SequenceGenerator(name = "POST_ID_SEQ", allocationSize = 1)
     private Long id;
 
+    @JsonIgnore
     @Id
     @ManyToOne
     @JoinColumn

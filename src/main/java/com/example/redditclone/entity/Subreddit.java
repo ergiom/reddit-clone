@@ -12,7 +12,8 @@ import javax.persistence.*;
 @AllArgsConstructor
 public class Subreddit {
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "SUBREDDIT_ID_SEQ")
+    @SequenceGenerator(name = "SUBREDDIT_ID_SEQ", allocationSize = 1)
     private Long id;
 
     @ManyToOne
