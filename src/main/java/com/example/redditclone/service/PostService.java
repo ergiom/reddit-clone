@@ -35,7 +35,7 @@ public class PostService {
         Optional<Post> optPost = postRepository.findByIdAndSubredditId(id, subredditId);
         if (optPost.isPresent()) return optPost.get();
 
-        throw new RuntimeException("Post not found");
+        throw new RuntimeException("Post of id: " + id + " not found!");
     }
 
     public void savePost(PostModel postModel) {
@@ -59,7 +59,12 @@ public class PostService {
     }
 
     public void deletePostById(long subredditId, long id) {
-        postRepository.deleteByIdAndSubredditId(id, subredditId);
+        Optional<Post> optPost = postRepository.findByIdAndSubredditId(id, subredditId);
+        if (!optPost.isPresent()) return;
+
+        Post post = optPost.get();
+        log.info("Deleting post: " + post);
+        postRepository.delete(post);
     }
 
     public void updatePost(PostModel values) {
@@ -73,6 +78,7 @@ public class PostService {
         if (values.getTitle() != null) post.setTitle(values.getTitle());
         post.setLastEdited(now);
 
+        log.info("Updating post: " + post);
         postRepository.save(post);
     }
 }

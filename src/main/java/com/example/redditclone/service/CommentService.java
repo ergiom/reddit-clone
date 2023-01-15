@@ -4,6 +4,7 @@ import com.example.redditclone.entity.Comment;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.repository.CommentRepository;
 import com.example.redditclone.repository.UserRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -12,15 +13,15 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@Slf4j
 public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    //todo replace with service
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private SubredditService subredditService;
 
     @Autowired
     private PostService postService;
@@ -31,7 +32,12 @@ public class CommentService {
 
     public Comment findCommentById(long subredditId, long postId, long id) {
         Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
-        if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
+        if (!optComment.isPresent()) throw new RuntimeException(
+                "Comment of id: " + id +
+                " to post of id: " + postId +
+                " in subreddit of id: " + subredditId +
+                " not found"
+        );
 
         return optComment.get();
     }
@@ -52,11 +58,17 @@ public class CommentService {
                 .lastEdited(now)
                 .build();
 
+        log.info("Saving new comment: " + comment);
         commentRepository.save(comment);
     }
 
     public void deleteComment(long subredditId, long postId, long id) {
-        commentRepository.deleteByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
+        Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
+        if (!optComment.isPresent()) return;
+        Comment comment = optComment.get();
+
+        log.info("Deleting comment: " + comment);
+        commentRepository.delete(comment);
     }
 
     public void updateComment(CommentModel values) {
@@ -72,6 +84,7 @@ public class CommentService {
 
         if (values.getContent() != null) comment.setContent(values.getContent());
         comment.setLastEdited(now);
+        log.info("Updating comment: " + comment);
         commentRepository.save(comment);
     }
 }
