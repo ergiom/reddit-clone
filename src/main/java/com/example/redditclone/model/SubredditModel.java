@@ -10,7 +10,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class SubredditModel {
-    private Long id;
     private Long ownerId;
     private String name;
 }

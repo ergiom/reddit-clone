@@ -1,5 +1,6 @@
 package com.example.redditclone.controller;
 
+import com.example.redditclone.entity.Subreddit;
 import com.example.redditclone.model.SubredditModel;
 import com.example.redditclone.service.SubredditService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +16,12 @@ public class SubredditController {
     private SubredditService subredditService;
 
     @GetMapping
-    public List<SubredditModel> getAllSubreddits() {
+    public List<Subreddit> getAllSubreddits() {
         return subredditService.fetchSubreddits();
     }
 
     @GetMapping("{id}")
-    public SubredditModel getSubreddit(@PathVariable(name = "id") long id) {
+    public Subreddit getSubreddit(@PathVariable(name = "id") long id) {
         return subredditService.fetchSubreddit(id);
     }
 
