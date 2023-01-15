@@ -3,7 +3,6 @@ package com.example.redditclone.entity;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.List;
 
 @Entity
 @Table(name = "subreddit_tbl")
@@ -20,5 +19,6 @@ public class Subreddit {
     private User owner;
 
     private String name;
+    //todo
 //    private List<Post> posts;
 }
