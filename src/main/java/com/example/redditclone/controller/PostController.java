@@ -45,7 +45,6 @@ public class PostController {
                            @PathVariable(name = "subreddit_id") long subredditId,
                            @RequestBody PostModel newPost) {
         newPost.setId(id);
-//        newPost.setSubredditId(subredditId);
         postService.updatePost(newPost);
     }
 }
