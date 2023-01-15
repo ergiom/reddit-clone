@@ -13,8 +13,8 @@ import java.time.LocalTime;
 @AllArgsConstructor
 public class CommentModel {
     private Long id;
-    private Long authorId;
     private Long postId;
+    private Long subredditId;
     private Long parentCommentId;
     private String content;
     private LocalTime published;

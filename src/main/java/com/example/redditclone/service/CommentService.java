@@ -1,13 +1,13 @@
 package com.example.redditclone.service;
 
+import com.example.redditclone.entity.Comment;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.repository.CommentRepository;
+import com.example.redditclone.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalTime;
-import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,65 +16,58 @@ public class CommentService {
 
     @Autowired
     private CommentRepository commentRepository;
+    @Autowired
+    private UserRepository userRepository;
 
-    private List<CommentModel> comments = new LinkedList<>(Arrays.asList(
-            new CommentModel(1L, 1L, 1L, null, "1 comment content", LocalTime.now(), LocalTime.now()),
-            new CommentModel(2L, 1L, 1L, 1L, "2 comment content", LocalTime.now(), LocalTime.now()),
-            new CommentModel(3L, 1L, 1L, 1L, "3 comment content", LocalTime.now(), LocalTime.now()),
-            new CommentModel(4L, 1L, 1L, 2L, "4 comment content", LocalTime.now(), LocalTime.now()),
-            new CommentModel(5L, 1L, 1L, null, "5 comment content", LocalTime.now(), LocalTime.now())
-    ));
+    @Autowired
+    private SubredditService subredditService;
 
-    public List<CommentModel> getAllCommentsForPost(long postId) {
-        return getCommentsForPost(postId);
+    @Autowired
+    private PostService postService;
+
+    public List<Comment> getAllCommentsForPost(long subredditId, long postId) {
+        return commentRepository.findAllBySubredditIdAndPostId(subredditId, postId);
     }
 
-    public CommentModel findCommentById(long id) {
-        Optional<CommentModel> optComment = findComment(id);
+    public Comment findCommentById(long subredditId, long postId, long id) {
+        Optional<Comment> optComment = commentRepository.findBySubredditIdAndPostIdAndId(subredditId, postId, id);
         if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
 
         return optComment.get();
     }
 
-    private Optional<CommentModel> findComment(long id) {
-        for (CommentModel comment: comments) {
-            if (comment.getId() == id) return Optional.of(comment);
-        }
-
-        return Optional.empty();
-    }
-
-    private List<CommentModel> getCommentsForPost(long postId) {
-        List<CommentModel> selectedComments = new LinkedList<>();
-        for (CommentModel comment: comments) {
-            if (comment.getPostId() == postId) selectedComments.add(comment);
-        }
-
-        return selectedComments;
-    }
-
-    public void saveComment(CommentModel comment) {
+    public void saveComment(CommentModel values) {
         LocalTime now = LocalTime.now();
-        comment.setPublished(now);
-        comment.setLastEdited(now);
-        comments.add(comment);
+        Comment comment = Comment.builder()
+                .author(userRepository.findById(1L).get())
+                .parentComment(null)
+                .subreddit(subredditService.fetchSubreddit(values.getSubredditId()))
+                .post(postService.findPostById(values.getSubredditId(), values.getPostId()))
+                .content(values.getContent())
+                .published(now)
+                .lastEdited(now)
+                .build();
+
+        commentRepository.save(comment);
     }
 
-    public void deleteComment(long id) {
-        Optional<CommentModel> optComment = findComment(id);
-        if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
-
-        comments.remove(optComment.get());
+    public void deleteComment(long subredditId, long postId, long id) {
+        commentRepository.deleteBySubredditIdAndPostIdAndId(subredditId, postId, id);
     }
 
     public void updateComment(CommentModel values) {
-        Optional<CommentModel> optComment = findComment(values.getId());
+        Optional<Comment> optComment = commentRepository.findBySubredditIdAndPostIdAndId(
+                values.getSubredditId(),
+                values.getPostId(),
+                values.getId()
+        );
         if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
 
         LocalTime now = LocalTime.now();
-        CommentModel comment = optComment.get();
-        comment.setLastEdited(now);
+        Comment comment = optComment.get();
 
         if (values.getContent() != null) comment.setContent(values.getContent());
+        comment.setLastEdited(now);
+        commentRepository.save(comment);
     }
 }

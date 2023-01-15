@@ -1,5 +1,6 @@
 package com.example.redditclone.controller;
 
+import com.example.redditclone.entity.Comment;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,40 +16,52 @@ public class CommentController {
     private CommentService commentService;
 
     @GetMapping
-    public List<CommentModel> getAllCommentsForPost(@PathVariable("post_id") long postId) {
-        return commentService.getAllCommentsForPost(postId);
+    public List<Comment> getAllCommentsForPost(@PathVariable("subreddit_id") long subredditId,
+                                               @PathVariable("post_id") long postId) {
+        return commentService.getAllCommentsForPost(subredditId, postId);
     }
 
     @GetMapping("{id}")
-    public CommentModel findComment(@PathVariable("id") long id) {
-        return commentService.findCommentById(id);
+    public Comment findComment(@PathVariable("subreddit_id") long subredditId,
+                               @PathVariable("post_id") long postId,
+                               @PathVariable("id") long id) {
+        return commentService.findCommentById(subredditId, postId, id);
     }
 
     @PostMapping
     public void saveComment(@RequestBody CommentModel comment,
-                            @PathVariable(name = "post_id") long postId) {
+                            @PathVariable("subreddit_id") long subredditId,
+                            @PathVariable("post_id") long postId) {
+        comment.setSubredditId(subredditId);
         comment.setPostId(postId);
-        comment.setParentCommentId(null);
         commentService.saveComment(comment);
     }
 
     @PostMapping("{parent_id}")
     public void saveChildComment(@RequestBody CommentModel comment,
-                                 @PathVariable(name = "parent_id") long parentId,
-                                 @PathVariable(name = "post_id") long postId) {
+                                 @PathVariable("parent_id") long parentId,
+                                 @PathVariable("subreddit_id") long subredditId,
+                                 @PathVariable("post_id") long postId) {
+        comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         comment.setParentCommentId(parentId);
         commentService.saveComment(comment);
     }
 
     @DeleteMapping("{id}")
-    public void deleteComment(@PathVariable(name = "id") long id) {
-        commentService.deleteComment(id);
+    public void deleteComment(@PathVariable("subreddit_id") long subredditId,
+                              @PathVariable("post_id") long postId,
+                              @PathVariable("id") long id) {
+        commentService.deleteComment(subredditId, postId, id);
     }
 
     @PutMapping("{id}")
     public void updateComment(@RequestBody CommentModel comment,
-                              @PathVariable(name = "id") long id) {
+                              @PathVariable("subreddit_id") long subredditId,
+                              @PathVariable("post_id") long postId,
+                              @PathVariable("id") long id) {
+        comment.setSubredditId(subredditId);
+        comment.setPostId(postId);
         comment.setId(id);
         commentService.updateComment(comment);
     }

@@ -5,11 +5,8 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
-import java.time.LocalDate;
+import javax.persistence.*;
+import java.time.LocalTime;
 
 @Entity
 @Table(name = "comment_tbl")
@@ -17,10 +14,22 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@IdClass(CompositeCommentPK.class)
 public class Comment {
 
-    @EmbeddedId
-    private CompositeCommentPK pk;
+    @Id
+    @ManyToOne
+    @JoinColumn
+    private Subreddit subreddit;
+
+    @Id
+    @ManyToOne
+    @JoinColumns()
+    private Post post;
+
+    @Id
+    @GeneratedValue
+    private Long id;
 
     @ManyToOne
     private User author;
@@ -29,6 +38,6 @@ public class Comment {
     private Comment parentComment;
 
     private String content;
-    private LocalDate published;
-    private LocalDate lastEdited;
+    private LocalTime published;
+    private LocalTime lastEdited;
 }
