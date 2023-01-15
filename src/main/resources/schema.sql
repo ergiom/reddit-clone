@@ -27,6 +27,8 @@ CREATE TABLE comment_tbl (
     post_id BIGINT,
     id BIGINT,
     author_id BIGINT,
+    parent_comment_subreddit_id BIGINT,
+    parent_comment_post_id BIGINT,
     parent_comment_id BIGINT,
     content VARCHAR(255),
     published TIME,
