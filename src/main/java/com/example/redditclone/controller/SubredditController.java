@@ -1,6 +1,8 @@
 package com.example.redditclone.controller;
 
 import com.example.redditclone.entity.Subreddit;
+import com.example.redditclone.error.SubredditNotFoundException;
+import com.example.redditclone.error.UserNotFoundException;
 import com.example.redditclone.model.SubredditModel;
 import com.example.redditclone.service.SubredditService;
 import com.example.redditclone.validation.SaveValidation;
@@ -24,7 +26,7 @@ public class SubredditController {
     }
 
     @GetMapping("{id}")
-    public Subreddit getSubreddit(@PathVariable(name = "id") long id) {
+    public Subreddit getSubreddit(@PathVariable(name = "id") long id) throws SubredditNotFoundException {
         return subredditService.fetchSubreddit(id);
     }
 
@@ -40,7 +42,7 @@ public class SubredditController {
 
     @PutMapping("{id}")
     public void updateSubreddit(@Validated(UpdateValidation.class) @PathVariable(name = "id") long id,
-                                @RequestBody SubredditModel newSubreddit) {
+                                @RequestBody SubredditModel newSubreddit) throws SubredditNotFoundException, UserNotFoundException {
         subredditService.updateSubreddit(id, newSubreddit);
     }
 }

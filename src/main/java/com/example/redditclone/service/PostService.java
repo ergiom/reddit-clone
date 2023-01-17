@@ -2,6 +2,8 @@ package com.example.redditclone.service;
 
 import com.example.redditclone.entity.Post;
 import com.example.redditclone.entity.Subreddit;
+import com.example.redditclone.error.PostNotFoundException;
+import com.example.redditclone.error.SubredditNotFoundException;
 import com.example.redditclone.model.PostModel;
 import com.example.redditclone.repository.PostRepository;
 import com.example.redditclone.repository.SubredditRepository;
@@ -31,16 +33,18 @@ public class PostService {
         return postRepository.findBySubredditId(subredditId);
     }
 
-    public Post findPostById(long subredditId, long id) {
+    public Post findPostById(long subredditId, long id) throws PostNotFoundException {
         Optional<Post> optPost = postRepository.findByIdAndSubredditId(id, subredditId);
         if (optPost.isPresent()) return optPost.get();
 
-        throw new RuntimeException("Post of id: " + id + " not found!");
+        throw new PostNotFoundException("Post of id: " + id + " not found!");
     }
 
-    public void savePost(PostModel postModel) {
-        Optional<Subreddit> optSubreddit = subredditRepository.findById(postModel.getSubredditId());
-        if (!optSubreddit.isPresent()) throw new RuntimeException("Subreddit does not exist");
+    public void savePost(PostModel postModel) throws SubredditNotFoundException {
+        long subredditId = postModel.getSubredditId();
+
+        Optional<Subreddit> optSubreddit = subredditRepository.findById(subredditId);
+        if (!optSubreddit.isPresent()) throw new SubredditNotFoundException("Subreddit of id: " + subredditId + " does not exist!");
 
         Subreddit subreddit = optSubreddit.get();
         LocalTime now = LocalTime.now();
@@ -67,9 +71,10 @@ public class PostService {
         postRepository.delete(post);
     }
 
-    public void updatePost(PostModel values) {
-        Optional<Post> optPost = postRepository.findByIdAndSubredditId(values.getId(), values.getSubredditId());
-        if (!optPost.isPresent()) throw new RuntimeException("Post not found");
+    public void updatePost(PostModel values) throws PostNotFoundException {
+        long postId = values.getId();
+        Optional<Post> optPost = postRepository.findByIdAndSubredditId(postId, values.getSubredditId());
+        if (!optPost.isPresent()) throw new PostNotFoundException("Post of id: " + postId + " not found");
 
         LocalTime now = LocalTime.now();
         Post post = optPost.get();

@@ -1,6 +1,8 @@
 package com.example.redditclone.service;
 
 import com.example.redditclone.entity.Comment;
+import com.example.redditclone.error.CommentNotFoundException;
+import com.example.redditclone.error.PostNotFoundException;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.repository.CommentRepository;
 import com.example.redditclone.repository.UserRepository;
@@ -30,19 +32,14 @@ public class CommentService {
         return commentRepository.findAllByPostSubredditIdAndPostId(subredditId, postId);
     }
 
-    public Comment findCommentById(long subredditId, long postId, long id) {
+    public Comment findCommentById(long subredditId, long postId, long id) throws CommentNotFoundException {
         Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(subredditId, postId, id);
-        if (!optComment.isPresent()) throw new RuntimeException(
-                "Comment of id: " + id +
-                " to post of id: " + postId +
-                " in subreddit of id: " + subredditId +
-                " not found"
-        );
+        if (!optComment.isPresent()) throw new CommentNotFoundException("Comment of id: " + id + " does not exist");
 
         return optComment.get();
     }
 
-    public void saveComment(CommentModel values) {
+    public void saveComment(CommentModel values) throws PostNotFoundException {
         LocalTime now = LocalTime.now();
         Optional<Comment> optParentComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
                 values.getSubredditId(),
@@ -71,13 +68,14 @@ public class CommentService {
         commentRepository.delete(comment);
     }
 
-    public void updateComment(CommentModel values) {
+    public void updateComment(CommentModel values) throws CommentNotFoundException {
+        long commentId = values.getId();
         Optional<Comment> optComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
                 values.getSubredditId(),
                 values.getPostId(),
                 values.getId()
         );
-        if (!optComment.isPresent()) throw new RuntimeException("Comment not found");
+        if (!optComment.isPresent()) throw new CommentNotFoundException("Comment of id: " + commentId + " not found");
 
         LocalTime now = LocalTime.now();
         Comment comment = optComment.get();

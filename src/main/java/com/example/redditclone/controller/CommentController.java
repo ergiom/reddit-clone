@@ -1,6 +1,8 @@
 package com.example.redditclone.controller;
 
 import com.example.redditclone.entity.Comment;
+import com.example.redditclone.error.CommentNotFoundException;
+import com.example.redditclone.error.PostNotFoundException;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.service.CommentService;
 import com.example.redditclone.validation.SaveValidation;
@@ -27,14 +29,14 @@ public class CommentController {
     @GetMapping("{id}")
     public Comment findComment(@PathVariable("subreddit_id") long subredditId,
                                @PathVariable("post_id") long postId,
-                               @PathVariable("id") long id) {
+                               @PathVariable("id") long id) throws CommentNotFoundException {
         return commentService.findCommentById(subredditId, postId, id);
     }
 
     @PostMapping
     public void saveComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                             @PathVariable("subreddit_id") long subredditId,
-                            @PathVariable("post_id") long postId) {
+                            @PathVariable("post_id") long postId) throws PostNotFoundException {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         commentService.saveComment(comment);
@@ -45,7 +47,7 @@ public class CommentController {
     public void saveChildComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                                  @PathVariable("parent_id") long parentId,
                                  @PathVariable("subreddit_id") long subredditId,
-                                 @PathVariable("post_id") long postId) {
+                                 @PathVariable("post_id") long postId) throws PostNotFoundException {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         comment.setParentCommentId(parentId);
@@ -63,7 +65,7 @@ public class CommentController {
     public void updateComment(@Validated(UpdateValidation.class) @RequestBody CommentModel comment,
                               @PathVariable("subreddit_id") long subredditId,
                               @PathVariable("post_id") long postId,
-                              @PathVariable("id") long id) {
+                              @PathVariable("id") long id) throws CommentNotFoundException {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         comment.setId(id);

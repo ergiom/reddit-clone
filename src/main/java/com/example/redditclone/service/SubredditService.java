@@ -2,6 +2,8 @@ package com.example.redditclone.service;
 
 import com.example.redditclone.entity.Subreddit;
 import com.example.redditclone.entity.User;
+import com.example.redditclone.error.SubredditNotFoundException;
+import com.example.redditclone.error.UserNotFoundException;
 import com.example.redditclone.model.SubredditModel;
 import com.example.redditclone.repository.SubredditRepository;
 import com.example.redditclone.repository.UserRepository;
@@ -38,11 +40,11 @@ public class SubredditService {
         subredditRepository.save(subreddit);
     }
 
-    public Subreddit fetchSubreddit(long id) {
+    public Subreddit fetchSubreddit(long id) throws SubredditNotFoundException {
         Optional<Subreddit> optSubreddit = subredditRepository.findById(id);
         if (optSubreddit.isPresent()) return optSubreddit.get();
 
-        throw new RuntimeException("Subreddit of id: " + id + " does not exist!");
+        throw new SubredditNotFoundException("Subreddit of id: " + id + " does not exist!");
     }
 
     public void removeSubreddit(long id) {
@@ -54,9 +56,9 @@ public class SubredditService {
         subredditRepository.delete(subreddit);
     }
 
-    public void updateSubreddit(long id, SubredditModel values) {
+    public void updateSubreddit(long id, SubredditModel values) throws SubredditNotFoundException, UserNotFoundException {
         Optional<Subreddit> optSubreddit = subredditRepository.findById(id);
-        if (!optSubreddit.isPresent()) throw new RuntimeException("This subreddit does not exist");
+        if (!optSubreddit.isPresent()) throw new SubredditNotFoundException("Subreddit of id: " + id + " does not exist!");
 
         Subreddit subreddit = optSubreddit.get();
         updateSubreddit(subreddit, values);
@@ -64,11 +66,11 @@ public class SubredditService {
         subredditRepository.save(subreddit);
     }
 
-    private void updateSubreddit(Subreddit subreddit, SubredditModel values) {
+    private void updateSubreddit(Subreddit subreddit, SubredditModel values) throws UserNotFoundException {
         if (values.getOwnerId() != null) {
             Optional<User> optOwner = userRepository.findById(values.getOwnerId());
             if (!optOwner.isPresent())
-                throw new RuntimeException("User of id: " + values.getOwnerId() + " does not exist!");
+                throw new UserNotFoundException("User of id: " + values.getOwnerId() + " does not exist!");
 
             User owner = optOwner.get();
             subreddit.setOwner(owner);
