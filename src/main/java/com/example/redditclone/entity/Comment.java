@@ -5,6 +5,10 @@ import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
+
+//todo serialize with parent/child ids
 
 @Entity
 @IdClass(CompositeCommentPK.class)
@@ -37,6 +41,7 @@ public class Comment {
     @ToString.Exclude
     private User author;
 
+    @JsonIgnore
     @ManyToOne
     @JoinColumns({
             @JoinColumn(name = "parent_comment_subreddit_id", referencedColumnName = "subreddit_id"),
@@ -45,6 +50,11 @@ public class Comment {
     })
     @ToString.Exclude
     private Comment parentComment;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "parentComment", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
+    private List<Comment> childComments;
 
     @Column(nullable = false)
     private String content;
@@ -69,7 +79,12 @@ public class Comment {
     }
 
     @ToString.Include
-    public Long strParentComment() {
-        return parentComment.getId();
+    public Long strParentCommentId() {
+        return parentComment == null ? null : parentComment.getId();
+    }
+
+    @ToString.Include
+    public List<Long> strChildCommentIds() {
+        return childComments == null ? null : childComments.stream().map(Comment::getId).collect(Collectors.toList());
     }
 }
