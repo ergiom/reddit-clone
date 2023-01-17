@@ -5,8 +5,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalTime;
-
 @Data
 @Builder
 @NoArgsConstructor
@@ -17,6 +15,4 @@ public class CommentModel {
     private Long subredditId;
     private Long parentCommentId;
     private String content;
-    private LocalTime published;
-    private LocalTime lastEdited;
 }
