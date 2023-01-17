@@ -3,7 +3,10 @@ package com.example.redditclone.controller;
 import com.example.redditclone.entity.Post;
 import com.example.redditclone.model.PostModel;
 import com.example.redditclone.service.PostService;
+import com.example.redditclone.validation.SaveValidation;
+import com.example.redditclone.validation.UpdateValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -27,7 +30,7 @@ public class PostController {
     }
 
     @PostMapping
-    public void savePost(@RequestBody PostModel post,
+    public void savePost(@Validated(SaveValidation.class) @RequestBody PostModel post,
                          @PathVariable(name = "subreddit_id") long subredditId) {
         post.setSubredditId(subredditId);
         postService.savePost(post);
@@ -40,7 +43,7 @@ public class PostController {
     }
 
     @PutMapping("{id}")
-    public void updatePost(@PathVariable(name = "id") long id,
+    public void updatePost(@Validated(UpdateValidation.class) @PathVariable(name = "id") long id,
                            @PathVariable(name = "subreddit_id") long subredditId,
                            @RequestBody PostModel values) {
         values.setId(id);

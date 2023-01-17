@@ -3,7 +3,10 @@ package com.example.redditclone.controller;
 import com.example.redditclone.entity.Comment;
 import com.example.redditclone.model.CommentModel;
 import com.example.redditclone.service.CommentService;
+import com.example.redditclone.validation.SaveValidation;
+import com.example.redditclone.validation.UpdateValidation;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -29,7 +32,7 @@ public class CommentController {
     }
 
     @PostMapping
-    public void saveComment(@RequestBody CommentModel comment,
+    public void saveComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                             @PathVariable("subreddit_id") long subredditId,
                             @PathVariable("post_id") long postId) {
         comment.setSubredditId(subredditId);
@@ -39,7 +42,7 @@ public class CommentController {
     }
 
     @PostMapping("{parent_id}")
-    public void saveChildComment(@RequestBody CommentModel comment,
+    public void saveChildComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                                  @PathVariable("parent_id") long parentId,
                                  @PathVariable("subreddit_id") long subredditId,
                                  @PathVariable("post_id") long postId) {
@@ -57,7 +60,7 @@ public class CommentController {
     }
 
     @PutMapping("{id}")
-    public void updateComment(@RequestBody CommentModel comment,
+    public void updateComment(@Validated(UpdateValidation.class) @RequestBody CommentModel comment,
                               @PathVariable("subreddit_id") long subredditId,
                               @PathVariable("post_id") long postId,
                               @PathVariable("id") long id) {
