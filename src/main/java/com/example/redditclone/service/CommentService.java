@@ -39,21 +39,30 @@ public class CommentService {
         return optComment.get();
     }
 
-    public void saveComment(CommentModel values) throws PostNotFoundException {
+    public void saveComment(CommentModel values) throws PostNotFoundException, CommentNotFoundException {
+        log.info("Received values for new comment: " + values);
         LocalTime now = LocalTime.now();
-        Optional<Comment> optParentComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
-                values.getSubredditId(),
-                values.getPostId(),
-                values.getParentCommentId());
-
         Comment comment = Comment.builder()
                 .author(userRepository.findById(1L).get())
-                .parentComment(optParentComment.orElse(null))
                 .post(postService.findPostById(values.getSubredditId(), values.getPostId()))
                 .content(values.getContent())
                 .published(now)
                 .lastEdited(now)
                 .build();
+
+        Long parentCommentId = values.getParentCommentId();
+        if (parentCommentId != null) {
+            Optional<Comment> optParentComment = commentRepository.findByPostSubredditIdAndPostIdAndId(
+                    values.getSubredditId(),
+                    values.getPostId(),
+                    parentCommentId);
+
+            if (!optParentComment.isPresent())
+                throw new CommentNotFoundException("Parent comment of id: " + parentCommentId + " not found");
+
+            Comment parentComment = optParentComment.get();
+            comment.setParentComment(parentComment);
+        }
 
         log.info("Saving new comment: " + comment);
         commentRepository.save(comment);

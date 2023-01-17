@@ -1,6 +1,7 @@
 package com.example.redditclone.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
@@ -83,6 +84,7 @@ public class Comment {
         return parentComment == null ? null : parentComment.getId();
     }
 
+    @JsonProperty("childCommentIds")
     @ToString.Include
     public List<Long> strChildCommentIds() {
         return childComments == null ? null : childComments.stream().map(Comment::getId).collect(Collectors.toList());

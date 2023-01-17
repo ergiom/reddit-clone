@@ -1,8 +1,10 @@
 package com.example.redditclone.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;
+import java.util.List;
 
 @Entity
 @Table(name = "subreddit_tbl")
@@ -22,6 +24,11 @@ public class Subreddit {
     @JoinColumn(nullable = false)
     @ToString.Exclude
     private User owner;
+
+    @JsonIgnore
+    @OneToMany(mappedBy = "subreddit", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
+    private List<Post> posts;
 
     @Column(nullable = false, unique = true)
     private String name;

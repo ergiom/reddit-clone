@@ -36,7 +36,7 @@ public class CommentController {
     @PostMapping
     public void saveComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                             @PathVariable("subreddit_id") long subredditId,
-                            @PathVariable("post_id") long postId) throws PostNotFoundException {
+                            @PathVariable("post_id") long postId) throws PostNotFoundException, CommentNotFoundException {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         commentService.saveComment(comment);
@@ -47,7 +47,7 @@ public class CommentController {
     public void saveChildComment(@Validated(SaveValidation.class) @RequestBody CommentModel comment,
                                  @PathVariable("parent_id") long parentId,
                                  @PathVariable("subreddit_id") long subredditId,
-                                 @PathVariable("post_id") long postId) throws PostNotFoundException {
+                                 @PathVariable("post_id") long postId) throws PostNotFoundException, CommentNotFoundException {
         comment.setSubredditId(subredditId);
         comment.setPostId(postId);
         comment.setParentCommentId(parentId);

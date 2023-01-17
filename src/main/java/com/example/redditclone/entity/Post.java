@@ -1,10 +1,13 @@
 package com.example.redditclone.entity;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 
 import javax.persistence.*;
 import java.time.LocalTime;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @IdClass(CompositePostPK.class)
@@ -35,6 +38,11 @@ public class Post {
     @ToString.Exclude
     private User author;
 
+    @JsonIgnore
+    @OneToMany(mappedBy = "post", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
+    private List<Comment> comments;
+
     @Column(nullable = false)
     private String title;
     @Column(nullable = false)
@@ -52,5 +60,11 @@ public class Post {
     @ToString.Include
     public Long strAuthorId() {
         return author.getId();
+    }
+
+    @JsonProperty("commentIds")
+    @ToString.Include
+    public List<Long> strCommentIds() {
+        return comments == null ? null : comments.stream().map(Comment::getId).collect(Collectors.toList());
     }
 }
